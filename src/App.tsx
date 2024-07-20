@@ -6,6 +6,8 @@ type FileItem = {
     type: "file" | "folder";
 };
 
+const BASE_URL = 'http://0.0.0.0:8000';
+
 const App: React.FC = () => {
     const [files, setFiles] = useState<FileItem[]>([]);
     const [currentFolder, setCurrentFolder] = useState<string>("");
@@ -16,7 +18,7 @@ const App: React.FC = () => {
 
     const fetchFiles = async (folder: string) => {
         try {
-            const response = await axios.get<FileItem[]>(`http://192.168.8.132:8000/files`, {
+            const response = await axios.get<FileItem[]>(`${BASE_URL}/files`, {
                 params: { folder }
             });
             setFiles(response.data);
@@ -33,7 +35,7 @@ const App: React.FC = () => {
             formData.append('folder', currentFolder);
 
             try {
-                const response = await axios.post('http://192.168.8.132:8000/upload', formData, {
+                const response = await axios.post(`${BASE_URL}/upload`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -50,7 +52,7 @@ const App: React.FC = () => {
         if (file.type === "folder") {
             setCurrentFolder((prev) => (prev ? `${prev}/${file.name}` : file.name));
         } else {
-            window.open(`http://192.168.8.132:8000/download?folder=${currentFolder}&filename=${file.name}`, '_blank');
+            window.open(`${BASE_URL}/download?folder=${currentFolder}&filename=${file.name}`, '_blank');
         }
     };
 
