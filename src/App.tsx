@@ -6,11 +6,22 @@ type FileItem = {
     type: "file" | "folder";
 };
 
-const BASE_URL = 'http://0.0.0.0:8000';
+// const BASE_URL = 'http://192.168.8.132:8000';
+const getHostURL = () => {
+    if (window.location.host === "localhost:5173") {
+        return "http://192.168.8.132:8000";
+    }else{
+        return "";
+    }
+  }
+  
+  console.log(getHostURL()); // This will log the host URL or IP to the console
+  
 
 const App: React.FC = () => {
     const [files, setFiles] = useState<FileItem[]>([]);
     const [currentFolder, setCurrentFolder] = useState<string>("");
+    const BASE_URL = getHostURL();
 
     useEffect(() => {
         fetchFiles(currentFolder);
@@ -69,7 +80,7 @@ const App: React.FC = () => {
             <hr />
             {currentFolder && <button onClick={handleBackClick}>Back</button>}
             <ul>
-                {files.map((file) => (
+                {files && files.map((file) => (
                     <li key={file.name} onDoubleClick={() => handleFileClick(file)}>
                         {file.type === "folder" ? "📁" : "📄"} {file.name}
                     </li>
