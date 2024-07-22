@@ -6,21 +6,20 @@ type FileItem = {
     type: "file" | "folder";
 };
 
-// const BASE_URL = 'http://192.168.8.132:8000';
 const getHostURL = () => {
     if (window.location.host === "localhost:5173") {
         return "http://192.168.8.132:8000";
-    }else{
+    } else {
         return "";
     }
-  }
-  
-  console.log(getHostURL()); // This will log the host URL or IP to the console
-  
+};
+
+console.log(getHostURL()); // This will log the host URL or IP to the console
 
 const App: React.FC = () => {
     const [files, setFiles] = useState<FileItem[]>([]);
     const [currentFolder, setCurrentFolder] = useState<string>("");
+    const [progress, setProgress] = useState<number>(0);
     const BASE_URL = getHostURL();
 
     useEffect(() => {
@@ -50,11 +49,17 @@ const App: React.FC = () => {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        setProgress(percentCompleted);
+                    }
                 });
                 console.log(response.data);
+                setProgress(0); // Reset progress after upload
                 fetchFiles(currentFolder);
             } catch (error) {
                 console.error(error);
+                setProgress(0); // Reset progress in case of error
             }
         }
     };
@@ -77,6 +82,13 @@ const App: React.FC = () => {
         <div className="App">
             <h1>Local Network Drive</h1>
             <input type="file" onChange={handleUpload} />
+            <br/>
+            {progress > 0 && (
+                <>
+                <progress value={progress} max="100">{progress}%</progress><span>{progress}%</span>
+                </>
+            )}
+            <br/>
             <hr />
             {currentFolder && <button onClick={handleBackClick}>Back</button>}
             <ul>
@@ -88,6 +100,6 @@ const App: React.FC = () => {
             </ul>
         </div>
     );
-}
+};
 
 export default App;
